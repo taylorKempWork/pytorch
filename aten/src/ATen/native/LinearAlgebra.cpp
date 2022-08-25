@@ -1132,12 +1132,14 @@ Tensor& math_addr_out(const Tensor& self,
 
 // torch.ger, alias for torch.outer
 Tensor& ger_out(const Tensor& self, const Tensor& vec2, Tensor &result) {
-  TORCH_WARN("torch.ger is deprecated and will be removed in a future PyTorch release. "
-             "Use torch.outer instead.");
+  TORCH_WARN_DEPRECATION("torch.ger is deprecated and will be removed in a future PyTorch "
+             "release. Use torch.outer instead.");
   return at::outer_out(result, self, vec2);
 }
 
 Tensor ger(const Tensor& self, const Tensor& vec2) {
+  TORCH_WARN_DEPRECATION("torch.ger is deprecated and will be removed in a future PyTorch "
+             "release. Use torch.outer instead.");
   return self.outer(vec2);
 }
 

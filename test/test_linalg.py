@@ -13,6 +13,7 @@ import random
 from random import randrange
 from itertools import product
 from functools import reduce, partial, wraps
+import re
 
 from torch.testing._internal.common_utils import \
     (TestCase, run_tests, TEST_SCIPY, IS_MACOS, IS_WINDOWS, slowTest,
@@ -140,6 +141,31 @@ class TestLinalg(TestCase):
         zero_strided = torch.randn(1).to(device=device, dtype=dtype).expand(50)
         run_test_case(zero_strided, b)
         run_test_case(a, zero_strided)
+
+    @dtypes(*all_types_and_complex_and(torch.half, torch.bfloat16, torch.bool))
+    def test_ger_deprecation_warning(self, device, dtype):
+        a = make_tensor(5, device=device, dtype=dtype)
+        b = make_tensor(5, device=device, dtype=dtype)
+        res = make_tensor(5, 5, device=device, dtype=dtype)
+
+        funcs = [
+            lambda: torch.ger(a, b),
+            lambda: torch.ger(a, b, out=res),
+        ]
+
+        for func in funcs:
+            with warnings.catch_warnings(record=True) as w:
+                warnings.resetwarnings()
+                warnings.filterwarnings('always', category=DeprecationWarning)
+
+                func()
+
+                self.assertEqual(len(w), 1, msg='DeprecationWarning not raised')
+                warning = w[0].message
+                self.assertTrue(isinstance(warning, DeprecationWarning), msg='DeprecationWarning not raised')
+                self.assertTrue(re.search(
+                    '^torch.ger is deprecated',
+                    str(warning)))
 
     def test_matrix_rank_removed_error(self, device):
         a = make_tensor(5, 5, device=device, dtype=torch.float32)
