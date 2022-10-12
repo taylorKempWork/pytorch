@@ -10,6 +10,7 @@ from typing import Union
 from typing import Optional
 import xml.etree.ElementTree as ET
 import functools
+import pytest
 
 # a lot of this file is copied from _pytest.junitxml and modified to get rerun info
 
@@ -165,3 +166,4 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
                     terminalreporter.write_sep("_", msg, red=True, bold=True)
                     terminalreporter._outrep_summary(rep)
                     terminalreporter._handle_teardown_sections(rep.nodeid)
+    yield
