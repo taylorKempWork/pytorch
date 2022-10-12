@@ -9869,6 +9869,12 @@ op_db: List[OpInfo] = [
                    }),
                    "TestDecomp", "test_comprehensive", device_type="cuda",
                ),
+               DecorateInfo(
+                   toleranceOverride({
+                       torch.complex64: tol(atol=5e-5, rtol=5e-5),
+                   }),
+                   "TestDecomp", "test_comprehensive", device_type="cuda",
+               ),
            ],
            skips=(
                # Strides are not the same!
