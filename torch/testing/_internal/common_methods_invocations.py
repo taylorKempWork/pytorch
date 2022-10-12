@@ -1093,7 +1093,7 @@ def sample_inputs_addcmul_addcdiv(op_info, device, dtype, requires_grad, **kwarg
         sample_inputs.append(SampleInput(
             args[0],
             args=args[1:],
-            kwargs=dict(value=3.14), broadcasts_input=broadcasts_input))
+            kwargs=dict(value=3.14 if dtype.is_floating_point or dtype.is_complex else 3), broadcasts_input=broadcasts_input))
 
     return tuple(sample_inputs)
 
@@ -8635,9 +8635,6 @@ op_db: List[OpInfo] = [
            skips=(
                # TODO: update sample inputs with for_inplace_variant kwarg to support this test
                DecorateInfo(unittest.expectedFailure, 'TestCommon', 'test_variant_consistency_eager'),
-               # 76047
-               DecorateInfo(unittest.expectedFailure, 'TestNNCOpInfo', 'test_nnc_correctness',
-                            dtypes=(torch.int8, torch.int16, torch.int32, torch.int64)),
            ),
            sample_inputs_func=sample_inputs_addcmul_addcdiv,
            reference_inputs_func=partial(
@@ -17548,6 +17545,10 @@ python_ref_db = [
     PythonRefInfo(
         "_refs.addcdiv",
         torch_opinfo_name="addcdiv",
+    ),
+    PythonRefInfo(
+        "_refs.addcmul",
+        torch_opinfo_name="addcmul",
     ),
     ElementwiseBinaryPythonRefInfo(
         "_refs.clamp_min",
